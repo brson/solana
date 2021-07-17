@@ -153,6 +153,11 @@ impl RpcSender for MockSender {
             }
             RpcRequest::GetTransactionCount => Value::Number(Number::from(1234)),
             RpcRequest::GetSlot => Value::Number(Number::from(0)),
+            RpcRequest::GetSnapshotSlot => Value::Number(Number::from(0)),
+            RpcRequest::GetBlockHeight => Value::Number(Number::from(1234)),
+            RpcRequest::GetSlotLeaders => {
+                json!([PUBKEY.to_string()])
+            }
             RpcRequest::GetMaxShredInsertSlot => Value::Number(Number::from(0)),
             RpcRequest::RequestAirdrop => Value::String(Signature::new(&[8; 64]).to_string()),
             RpcRequest::SendTransaction => {

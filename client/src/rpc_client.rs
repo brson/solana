@@ -786,10 +786,34 @@ impl RpcClient {
         )
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let result = rpc_client.get_snapshot_slot()?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_snapshot_slot(&self) -> ClientResult<Slot> {
         self.send(RpcRequest::GetSnapshotSlot, Value::Null)
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # use solana_sdk::signature::Signature;
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let signature = Signature::default();
+    /// let result = rpc_client.get_signature_status(&signature)?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_signature_status(
         &self,
         signature: &Signature,
@@ -797,6 +821,19 @@ impl RpcClient {
         self.get_signature_status_with_commitment(signature, self.commitment())
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::signature::Signature;
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let signature = Signature::default();
+    /// let result = rpc_client.get_signature_statuses(&[signature])?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_signature_statuses(
         &self,
         signatures: &[Signature],
@@ -805,6 +842,19 @@ impl RpcClient {
         self.send(RpcRequest::GetSignatureStatuses, json!([signatures]))
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::signature::Signature;
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let signature = Signature::default();
+    /// let result = rpc_client.get_signature_statuses_with_history(&[signature])?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_signature_statuses_with_history(
         &self,
         signatures: &[Signature],
@@ -818,6 +868,26 @@ impl RpcClient {
         )
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::{
+    /// #     commitment_config::CommitmentConfig,
+    /// #     signature::Signature,
+    /// # };
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let signature = Signature::default();
+    /// let commitment_config = CommitmentConfig::processed();
+    /// let result = rpc_client.get_signature_status_with_commitment(
+    ///     &signature,
+    ///     commitment_config,
+    /// )?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_signature_status_with_commitment(
         &self,
         signature: &Signature,
@@ -833,6 +903,28 @@ impl RpcClient {
             .map(|status_meta| status_meta.status))
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::{
+    /// #     commitment_config::CommitmentConfig,
+    /// #     signature::Signature,
+    /// # };
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let signature = Signature::default();
+    /// let commitment_config = CommitmentConfig::processed();
+    /// let search_transaction_history = true;
+    /// let result = rpc_client.get_signature_status_with_commitment_and_history(
+    ///     &signature,
+    ///     commitment_config,
+    ///     search_transaction_history,
+    /// )?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_signature_status_with_commitment_and_history(
         &self,
         signature: &Signature,
@@ -851,10 +943,34 @@ impl RpcClient {
             .map(|status_meta| status_meta.status))
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let result = rpc_client.get_slot()?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_slot(&self) -> ClientResult<Slot> {
         self.get_slot_with_commitment(self.commitment())
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::commitment_config::CommitmentConfig;
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let commitment_config = CommitmentConfig::processed();
+    /// let result = rpc_client.get_slot_with_commitment(commitment_config)?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_slot_with_commitment(
         &self,
         commitment_config: CommitmentConfig,
@@ -865,10 +981,34 @@ impl RpcClient {
         )
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let result = rpc_client.get_block_height()?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_block_height(&self) -> ClientResult<u64> {
         self.get_block_height_with_commitment(self.commitment())
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_sdk::commitment_config::CommitmentConfig;
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let commitment_config = CommitmentConfig::processed();
+    /// let result = rpc_client.get_block_height_with_commitment(commitment_config)?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_block_height_with_commitment(
         &self,
         commitment_config: CommitmentConfig,
@@ -879,6 +1019,20 @@ impl RpcClient {
         )
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// # use solana_client::{
+    /// #     rpc_client::RpcClient,
+    /// #     client_error::ClientError,
+    /// # };
+    /// # use solana_sdk::slot_history::Slot;
+    /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+    /// let start_slot = Slot::from(u64::MIN);
+    /// let limit = 1000;
+    /// let result = rpc_client.get_slot_leaders(start_slot, limit)?;
+    /// # Ok::<(), ClientError>(())
+    /// ```
     pub fn get_slot_leaders(&self, start_slot: Slot, limit: u64) -> ClientResult<Vec<Pubkey>> {
         self.send(RpcRequest::GetSlotLeaders, json!([start_slot, limit]))
             .and_then(|slot_leaders: Vec<String>| {
