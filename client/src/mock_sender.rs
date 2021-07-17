@@ -166,6 +166,16 @@ impl RpcSender for MockSender {
                 };
                 Value::String(signature)
             }
+            RpcRequest::SimulateTransaction => {
+                serde_json::to_value(Response {
+                    context: RpcResponseContext { slot: 1 },
+                    value: RpcSimulateTransactionResult {
+                        err: None,
+                        logs: None,
+                        accounts: None,
+                    },
+                })?
+            }
             RpcRequest::GetMinimumBalanceForRentExemption => Value::Number(Number::from(20)),
             RpcRequest::GetVersion => {
                 let version = Version::default();
