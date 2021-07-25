@@ -5,9 +5,20 @@ use {
         client_error::Result,
         rpc_request::RpcRequest,
         rpc_response::{
-            Response, RpcResponseContext, RpcSimulateTransactionResult, RpcVersionInfo,
+            Response,
+            RpcResponseContext,
+            RpcVersionInfo,
+            RpcSimulateTransactionResult,
+            RpcBlockProduction,
+            RpcBlockProductionRange,
+            RpcStakeActivation,
+            StakeActivationState,
+            RpcSupply,
+            RpcAccountBalance,
+            RpcVoteAccountStatus,
         },
         rpc_sender::RpcSender,
+        rpc_config::RpcBlockProductionConfig,
     },
     serde_json::{json, Number, Value},
     solana_sdk::{
@@ -158,6 +169,111 @@ impl RpcSender for MockSender {
             "getSlot" => json![0],
             "getMaxShredInsertSlot" => json![0],
             "requestAirdrop" => Value::String(Signature::new(&[8; 64]).to_string()),
+            "getSnapshotSlot" => Value::Number(Number::from(0)),
+            "getBlockHeight" => Value::Number(Number::from(1234)),
+            "getSlotLeaders" => json!([PUBKEY]),
+            "getBlockProduction" => {
+                if params.is_null() {
+                    json!(Response {
+                        context: RpcResponseContext { slot: 1 },
+                        value: RpcBlockProduction {
+                            by_identity: HashMap::new(),
+                            range: RpcBlockProductionRange {
+                                first_slot: 1,
+                                last_slot: 2,
+                            },
+                        },
+                    })
+                } else {
+                    let config: RpcBlockProductionConfig = serde_json::from_value(params).unwrap();
+                    let mut by_identity = HashMap::new();
+                    by_identity.insert(config.identity.unwrap(), (1, 123));
+                    let config_range = config.range.unwrap();
+                    
+                    json!(Response {
+                        context: RpcResponseContext { slot: 1 },
+                        value: RpcBlockProduction {
+                            by_identity,
+                            range: RpcBlockProductionRange {
+                                first_slot: config_range.first_slot,
+                                last_slot: {
+                                    if let Some(last_slot) = config_range.last_slot {
+                                        last_slot
+                                    } else {
+                                        2
+                                    }
+                                },
+                            },
+                        },
+                    })
+                }
+            },
+            "getStakeActivation" => json!(RpcStakeActivation {
+                state: StakeActivationState::Active,
+                active: 123,
+                inactive: 12,
+            }),
+            "getSupply" => json!(Response {
+                context: RpcResponseContext { slot: 1 },
+                value: RpcSupply {
+                    total: 100000000,
+                    circulating: 50000,
+                    non_circulating: 20000,
+                    non_circulating_accounts: vec![PUBKEY.to_string()],
+                },
+            }),
+            "getLargestAccounts" => {
+                let rpc_account_balance = RpcAccountBalance {
+                    address: PUBKEY.to_string(),
+                    lamports: 10000,
+                };
+
+                json!(Response {
+                    context: RpcResponseContext { slot: 1 },
+                    value: vec![rpc_account_balance],                  
+                })
+            }
+            "getVoteAccounts" => {
+                /*
+                let vote_keypair = Keypair::new();
+                let vote_pubkey = vote_keypair.pubkey();
+                let vote_state = VoteState::from(&vote_keypair);
+                
+                let validator_keypair = Keypair::new();
+                let validator_pubkey = validator_keypair.pubkey();
+                let current = RpcVoteAccountInfo {
+                    vote_pubkey: vote_pubkey,
+                    node_pubkey: validator_pubkey,
+                    activated_stake: vote_keypair.activated_stake,
+                    commission: vote_state.commission,
+                    root_slot: vote_state.root_slot.unwrap_or(0),
+                    epoch_vote_account: false,
+                    epoch_credits: vec![(123, 1, 12)],
+                    last_vote: 123,
+                };
+                
+                let delinquent = RpcVoteAccountInfo {
+                    vote_pubkey: vote_pubkey,
+                    node_pubkey: validator_pubkey,
+                    activated_stake: vote_keypair.activated_stake,
+                    commission: vote_state.commission,
+                    root_slot: vote_state.root_slot.unwrap_or(0),
+                    epoch_vote_account: false,
+                    last_vote: 0,
+                };
+                
+
+                json!(RpcVoteAccountStatus {
+                    current: vec![current],
+                    delinquent: vec![delinquent],
+                })
+                 */
+
+                json!(RpcVoteAccountStatus {
+                    current: vec![],
+                    delinquent: vec![],
+                })
+            }
             "sendTransaction" => {
                 let signature = if self.url == "malicious" {
                     Signature::new(&[8; 64]).to_string()
