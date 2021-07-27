@@ -559,6 +559,8 @@ impl RpcClient {
         commitment_config: CommitmentConfig,
     ) -> RpcResult<bool> {
         let Response { context, value } = self.get_signature_statuses(&[*signature])?;
+        info!("context: {:?}", context);
+        info!("value: {:?}", value);
 
         Ok(Response {
             context,
