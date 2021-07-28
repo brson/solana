@@ -1,10 +1,11 @@
-use log::{info, error};
+use log::{info, error, trace};
 use solana_client::client_error::Result as ClientResult;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::signature::{Keypair, Signer};
 use solana_sdk::system_transaction;
 use solana_core::test_validator::TestValidator;
 use solana_streamer::socket::SocketAddrSpace;
+use solana_transaction_status::TransactionConfirmationStatus;
 
 #[test]
 fn basic() -> ClientResult<()> {
@@ -54,15 +55,42 @@ fn get_signature_statuses() -> ClientResult<()> {
     let tx = system_transaction::transfer(&alice, &bob, lamports, recent_blockhash);
     let signature = rpc_client.send_transaction(&tx)?;
 
-    for _ in 0..100 {
+    let mut state = None;
+
+    // Test that the status of the transaction progresses
+    // from none, to processed, to confirmations, to finalized.
+    for _ in 0..1000 {
         let statuses = rpc_client.get_signature_statuses(&[signature])?;
         let status = statuses.value[0].as_ref();
         if let Some(status) = status {
-            info!("{:?}", status);
+            let cstatus = status.confirmation_status.clone().unwrap();
+            match (state, cstatus) {
+                (None | Some(TransactionConfirmationStatus::Processed),
+                 TransactionConfirmationStatus::Processed) => {
+                    state = Some(TransactionConfirmationStatus::Processed);
+                    trace!("processed");
+                },
+                (None | Some(TransactionConfirmationStatus::Processed) | Some(TransactionConfirmationStatus::Confirmed),
+                 TransactionConfirmationStatus::Confirmed) => {
+                    state = Some(TransactionConfirmationStatus::Confirmed);
+                    trace!("confirmed");
+                },
+                (None | Some(TransactionConfirmationStatus::Processed) | Some(TransactionConfirmationStatus::Confirmed),
+                 TransactionConfirmationStatus::Finalized) => {
+                    assert!(status.confirmations.is_none());
+                    trace!("finalized");
+                    return Ok(());
+                },
+                _ => {
+                    panic!("unexpected transaction status");
+                }
+            }
         } else {
-            std::thread::sleep_ms(100);
+            assert_eq!(state, None);
         }
+
+        std::thread::sleep_ms(100);
     }
 
-    panic!("no signature status");
+    panic!("tx not finalized in time");
 }

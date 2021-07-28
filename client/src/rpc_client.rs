@@ -857,6 +857,23 @@ impl RpcClient {
         self.get_signature_status_with_commitment(signature, self.commitment())
     }
 
+    /// Gets multiple transaction statuses from their signatures
+    ///
+    /// Gets the [`TransactionStatus`] of multiple transactions,
+    /// given their signatures.
+    ///
+    /// The vector returned has the same length as the input slice.
+    ///
+    /// For any transaction that has not been processed by the network,
+    /// the value the corresponding entry in the returned vector
+    /// is `None`. As a result, a transaction that has recently been submitted
+    /// will not have a status immediately.
+    ///
+    /// To submit a transaction and wait for it to confirm,
+    /// consider [`send_and_confirm_transaction`].
+    ///
+    /// 
+    ///
     /// # Examples
     ///
     /// ```
