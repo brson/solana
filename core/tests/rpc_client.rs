@@ -1,4 +1,4 @@
-use log::{info, error, trace};
+use log::trace;
 use solana_client::client_error::Result as ClientResult;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::signature::{Keypair, Signer};
@@ -6,6 +6,7 @@ use solana_sdk::system_transaction;
 use solana_core::test_validator::TestValidator;
 use solana_streamer::socket::SocketAddrSpace;
 use solana_transaction_status::TransactionConfirmationStatus;
+use std::time::Duration;
 
 #[test]
 fn basic() -> ClientResult<()> {
@@ -89,8 +90,35 @@ fn get_signature_statuses() -> ClientResult<()> {
             assert_eq!(state, None);
         }
 
-        std::thread::sleep_ms(100);
+        std::thread::sleep(Duration::from_millis(100));
     }
 
     panic!("tx not finalized in time");
+}
+
+#[test]
+fn get_signature_statuses_2() -> ClientResult<()> {
+    solana_logger::setup();
+
+    let alice = Keypair::new();
+    let validator = TestValidator::with_no_fees(alice.pubkey(), None, SocketAddrSpace::Unspecified);
+    let rpc_client = RpcClient::new(validator.rpc_url());
+
+    let bob = Keypair::new();
+    let lamports = 50;
+    let (recent_blockhash, _) = rpc_client.get_recent_blockhash()?;
+    let tx = system_transaction::transfer(&alice, &bob.pubkey(), lamports, recent_blockhash);
+    let signature = rpc_client.send_transaction(&tx)?;
+
+    let status = loop {
+        let statuses = rpc_client.get_signature_statuses(&[signature])?.value;
+        if let Some(status) = statuses[0].clone() {
+            break status;
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    };
+
+    assert!(status.err.is_none());
+
+    Ok(())
 }

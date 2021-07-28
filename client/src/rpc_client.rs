@@ -88,12 +88,45 @@ impl RpcClientConfig {
 /// `_with_commitment` methods, like
 /// [`RpcClient::confirm_transaction_with_commitment`].
 ///
+/// # Errors
+///
+/// Methods on `RpcClient` return [`client_error::Result`][crate::client_error::Result],
+/// and many of them return the [`RpcResult`][crate::rpc_response::RpcResult]
+/// typedef, which contains [`Response<T>`][crate::rpc_response::Response]
+/// on `Ok`. Both `client_error::Result` and [`RpcResult`]
+/// contain `ClientError` on error. In the case of `RpcResult`,
+/// the actual return value is in the [`value`][crate::rpc_response::Response::value] field,
+/// with RPC contextual information in the [`context`][crate::rpc_response::Response::context] field,
+/// so it is common for the value to be accessed with `?.value`,
+/// as in
+///
+/// ```
+/// # use solana_sdk::system_transaction;
+/// # use solana_client::rpc_client::RpcClient;
+/// # use solana_client::client_error::ClientError;
+/// # use solana_sdk::signature::{Keypair, Signer};
+/// # use solana_sdk::hash::Hash;
+/// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
+/// # let key = Keypair::new();
+/// # let to = solana_sdk::pubkey::new_rand();
+/// # let lamports = 50;
+/// # let recent_blockhash = Hash::default();
+/// # let tx = system_transaction::transfer(&key, &to, lamports, recent_blockhash);
+/// let signature = rpc_client.send_transaction(&tx)?;
+/// let statuses = rpc_client.get_signature_statuses(&[signature])?.value;
+/// # Ok::<(), ClientError>(())
+/// ```
+///
 /// Requests may timeout, in which case they return a [`ClientError`] where the
 /// [`ClientErrorKind`] is [`ClientErrorKind::Reqwest`], and where the interior
 /// [`reqwest::Error`](crate::client_error::reqwest::Error)s
 /// [`is_timeout`](crate::client_error::reqwest::Error::is_timeout) method
 /// returns `true`. The default timeout is 30 seconds, and may be changed by
 /// calling an appropriate constructor with a `timeout` parameter.
+///
+/// 
+///
+/// # TODO
 ///
 /// `RpcClient` encapsulates an [`RpcSender`], which implements the underlying
 /// RPC protocol. On top of `RpcSender` it adds methods for common tasks, while
@@ -857,7 +890,7 @@ impl RpcClient {
         self.get_signature_status_with_commitment(signature, self.commitment())
     }
 
-    /// Gets multiple transaction statuses from their signatures
+    /// Gets multiple transaction statuses from their signatures.
     ///
     /// Gets the [`TransactionStatus`] of multiple transactions,
     /// given their signatures.
@@ -870,9 +903,10 @@ impl RpcClient {
     /// will not have a status immediately.
     ///
     /// To submit a transaction and wait for it to confirm,
-    /// consider [`send_and_confirm_transaction`].
+    /// use [`send_and_confirm_transaction`][RpcClient::send_and_confirm_transaction].
     ///
-    /// 
+    /// This function ignores the configured confirmation level,
+    /// and returns the transaction status whatever it is.
     ///
     /// # Examples
     ///
@@ -888,15 +922,33 @@ impl RpcClient {
     /// #     system_transaction,
     /// # };
     /// # let rpc_client = RpcClient::new_mock("succeeds".to_string());
-    /// # let key = Keypair::new();
-    /// # let to = solana_sdk::pubkey::new_rand();
-    /// # let lamports = 50;
-    /// # let recent_blockhash = Hash::default();
-    /// # let tx = system_transaction::transfer(&key, &to, lamports, recent_blockhash);
+    /// # let alice = Keypair::new();
+    /// // Send lamports from Alice to Bob and wait for the transaction to be processed
+    /// let bob = Keypair::new();
+    /// let lamports = 50;
+    /// let (recent_blockhash, _) = rpc_client.get_recent_blockhash()?;
+    /// let tx = system_transaction::transfer(&alice, &bob.pubkey(), lamports, recent_blockhash);
     /// let signature = rpc_client.send_transaction(&tx)?;
-    /// let result = rpc_client.get_signature_statuses(&[signature])?;
+    ///
+    /// let status = loop {
+    ///    let statuses = rpc_client.get_signature_statuses(&[signature])?.value;
+    ///    if let Some(status) = statuses[0].clone() {
+    ///        break status;
+    ///    }
+    ///    std::thread::sleep(Duration::from_millis(100));
+    /// };
+    ///
+    /// assert!(status.err.is_none());
     /// # Ok::<(), ClientError>(())
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// TODO
+    ///
+    /// For any individual `TransactionStatus`,
+    /// that transaction may have triggered an error during processing,
+    /// in which case its [`err`][`TransactionStatus::err`] field will be `Some`.
     pub fn get_signature_statuses(
         &self,
         signatures: &[Signature],
