@@ -18,16 +18,20 @@ pub mod compute_budget;
 pub mod derivation_path;
 pub mod deserialize_utils;
 pub mod ed25519_instruction;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod entrypoint;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod entrypoint_deprecated;
 pub mod epoch_info;
 pub mod example_mocks;
 pub mod exit;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod feature;
 pub mod feature_set;
 pub mod fee;
 pub mod genesis_config;
 pub mod hard_forks;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod hash;
 pub mod inflation;
 pub mod keyed_account;
@@ -37,7 +41,9 @@ pub mod nonce_account;
 pub mod packet;
 pub mod poh_config;
 pub mod precompiles;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod program_utils;
+#[doc(hidden)] // hack - fix duplicate docs #26211
 pub mod pubkey;
 pub mod quic;
 pub mod recent_blockhashes_account;
@@ -53,46 +59,6 @@ pub mod transaction_context;
 pub mod transport;
 pub mod wasm;
 
-/// Same as `declare_id` except report that this id has been deprecated
-pub use solana_sdk_macro::declare_deprecated_id;
-/// Convenience macro to declare a static public key and functions to interact with it
-///
-/// Input: a single literal base58 string representation of a program's id
-///
-/// # Example
-///
-/// ```
-/// # // wrapper is used so that the macro invocation occurs in the item position
-/// # // rather than in the statement position which isn't allowed.
-/// use std::str::FromStr;
-/// use solana_sdk::{declare_id, pubkey::Pubkey};
-///
-/// # mod item_wrapper {
-/// #   use solana_sdk::declare_id;
-/// declare_id!("My11111111111111111111111111111111111111111");
-/// # }
-/// # use item_wrapper::id;
-///
-/// let my_id = Pubkey::from_str("My11111111111111111111111111111111111111111").unwrap();
-/// assert_eq!(id(), my_id);
-/// ```
-pub use solana_sdk_macro::declare_id;
-/// Convenience macro to define a static public key
-///
-/// Input: a single literal base58 string representation of a Pubkey
-///
-/// # Example
-///
-/// ```
-/// use std::str::FromStr;
-/// use solana_program::{pubkey, pubkey::Pubkey};
-///
-/// static ID: Pubkey = pubkey!("My11111111111111111111111111111111111111111");
-///
-/// let my_id = Pubkey::from_str("My11111111111111111111111111111111111111111").unwrap();
-/// assert_eq!(ID, my_id);
-/// ```
-pub use solana_sdk_macro::pubkey;
 pub use solana_sdk_macro::pubkeys;
 #[rustversion::since(1.46.0)]
 pub use solana_sdk_macro::respan;
