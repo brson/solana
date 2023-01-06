@@ -1,3 +1,23 @@
+//! Network clients of Solana nodes.
+//!
+//! todo
+//!
+//! Clients can be blocking or nonblocking, in which case they are written in
+//! asyncronous Rust, on top of the [tokio] runtime. The nonblocking clients are
+//! generally located under modules named "nonblocking".
+//!
+//! The main type of clients are _RPC clients_, which
+//! query nodes based on the [Solana JSON RPC API][JSON-RPC].
+//!
+//! [JSON-RPC]: https://docs.solana.com/developing/clients/jsonrpc-api
+//!
+//! - RPC clients - [`rpc_client`], [`RpcClient`], async
+//! - Pubsub clients
+//! - blockhash query?
+//! - QUIC clients
+//! - TPU clients
+//! - UDP clients
+
 #![allow(clippy::integer_arithmetic)]
 
 pub mod connection_cache;
