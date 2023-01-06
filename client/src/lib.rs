@@ -1,22 +1,56 @@
 //! Network clients of Solana nodes.
 //!
-//! todo
+//! A Solana cluster is composed of Solana nodes, some of which participate as
+//! validators. Other programs interact with the network as clients of those
+//! nodes.
 //!
-//! Clients can be blocking or nonblocking, in which case they are written in
-//! asyncronous Rust, on top of the [tokio] runtime. The nonblocking clients are
-//! generally located under modules named "nonblocking".
-//!
-//! The main type of clients are _RPC clients_, which
-//! query nodes based on the [Solana JSON RPC API][JSON-RPC].
+//! The main types of clients are _RPC clients_, and _pubsub clients_, which
+//! query, transact with, and receive events from Solana nodes via the [Solana
+//! JSON RPC API][JSON-RPC].
 //!
 //! [JSON-RPC]: https://docs.solana.com/developing/clients/jsonrpc-api
 //!
-//! - RPC clients - [`rpc_client`], [`RpcClient`], async
-//! - Pubsub clients
-//! - blockhash query?
-//! - QUIC clients
-//! - TPU clients
-//! - UDP clients
+//! Clients can be either blocking or nonblocking, in which case they are
+//! written in asyncronous Rust, on top of the [tokio] runtime. The nonblocking
+//! clients are generally located under modules named "nonblocking".
+//!
+//! [tokio]: https://docs.rs/tokio
+//!
+//! ## Solana client types
+//!
+//! **RPC clients** are for sending queries and transactions to a Solana node.
+//! The blocking type is [`rpc_client::RpcClient`]. The nonblocking type is
+//! [`rpc_client::nonblocking::RpcClient`].
+//!
+//! **Pubsub clients** are for receiving event notifications from a Solana node,
+//! and can be more efficient than querying with an RPC client. The blocking
+//! type is [`pubsub_client::PubsubClient`]. The nonblocking type is
+//! [`pubsub_client::nonblocking::PubsubClient`].
+//!
+//! **TPU clients** communicate directly with the [TPU] of the [slot leader] to
+//! fill blocks with transactions as fast as possible. Validators are TPU
+//! clients of each other. Most users do not need to use TPU clients. TODO
+//! todo tpc, udp, quic
+//!
+//! *Thin clients** todo
+//!
+//! [TPU]: https://docs.solana.com/validator/tpu
+//! [slot leader]: https://docs.solana.com/cluster/leader-rotation
+//!
+//! ## Client crates
+//!
+//! For historical reasons this `solana-client` crate is a façade that reexports
+//! every client type from other crates. Instead of using this crate
+//! users may want to use crates specific to their purpose:
+//!
+//! - [`solana-rpc-client`] -
+//! - [`solana-rpc-client-api`] -
+//! - [`solana-rpc-client-nonce-utils`] -
+//! - [`solana-pubsub-client`] -
+//! - [`solana-tpu-client`] -
+//! - [`solana-udp-client`] -
+//! - [`solana-quic-client`] -
+//! - [`solana-thin-client`] -
 
 #![allow(clippy::integer_arithmetic)]
 
