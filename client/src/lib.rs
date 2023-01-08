@@ -29,10 +29,11 @@
 //!
 //! **TPU clients** communicate directly with the [TPU] of the [slot leader] to
 //! fill blocks with transactions as fast as possible. Validators are TPU
-//! clients of each other. Most users do not need to use TPU clients. TODO
-//! todo tpc, udp, quic
-//!
-//! *Thin clients** todo
+//! clients of each other. Most users do not need to use TPU clients, though
+//! tools that need to submit many transactions may want to communicate directly
+//! with the TPU. An example of a tool that communicates directly with the TPU
+//! is `solana program deploy`, which posts many transactions to deploy a single
+//! program.
 //!
 //! [TPU]: https://docs.solana.com/validator/tpu
 //! [slot leader]: https://docs.solana.com/cluster/leader-rotation
@@ -50,13 +51,14 @@
 //! - [`solana-tpu-client`] -
 //! - [`solana-udp-client`] -
 //! - [`solana-quic-client`] -
-//! - [`solana-thin-client`] -
 
 #![allow(clippy::integer_arithmetic)]
 
 pub mod connection_cache;
 pub mod nonblocking;
 pub mod quic_client;
+
+/// A historical artifact used for internal testing.
 pub mod thin_client;
 pub mod tpu_client;
 pub mod tpu_connection;
