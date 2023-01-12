@@ -77,18 +77,24 @@ pub use solana_rpc_client::mock_sender_for_cli;
 pub mod blockhash_query {
     pub use solana_rpc_client_nonce_utils::blockhash_query::*;
 }
+
+/// Error types.
 pub mod client_error {
     pub use solana_rpc_client_api::client_error::{
         reqwest, Error as ClientError, ErrorKind as ClientErrorKind, Result,
     };
 }
+
 /// Durable transaction nonce helpers.
 pub mod nonce_utils {
     pub use solana_rpc_client_nonce_utils::*;
 }
+
+/// The publish/subscribe client.
 pub mod pubsub_client {
     pub use solana_pubsub_client::pubsub_client::*;
 }
+
 /// Communication with a Solana node over RPC.
 ///
 /// Software that interacts with the Solana blockchain, whether querying its
@@ -103,7 +109,8 @@ pub mod rpc_client {
 pub mod rpc_config {
     pub use solana_rpc_client_api::config::*;
 }
-/// Implementation defined RPC server errors
+
+/// Implementation-defined RPC server errors.
 pub mod rpc_custom_error {
     pub use solana_rpc_client_api::custom_error::*;
 }
@@ -119,6 +126,7 @@ pub mod rpc_request {
 pub mod rpc_response {
     pub use solana_rpc_client_api::response::*;
 }
+
 /// A transport for RPC calls.
 pub mod rpc_sender {
     pub use solana_rpc_client::rpc_sender::*;
