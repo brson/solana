@@ -12,7 +12,7 @@
 //!
 //! Clients can be either blocking or nonblocking, in which case they are
 //! written in asyncronous Rust, on top of the [tokio] runtime. The nonblocking
-//! clients are generally located under modules named "nonblocking".
+//! clients are generally located under the [`nonblocking`] module.
 //!
 //! [tokio]: https://docs.rs/tokio
 //!
@@ -20,12 +20,12 @@
 //!
 //! **RPC clients** are for sending queries and transactions to a Solana node.
 //! The blocking type is [`rpc_client::RpcClient`]. The nonblocking type is
-//! [`rpc_client::nonblocking::RpcClient`].
+//! [`nonblocking::rpc_client::RpcClient`].
 //!
 //! **Pubsub clients** are for receiving event notifications from a Solana node,
 //! and can be more efficient than querying with an RPC client. The blocking
 //! type is [`pubsub_client::PubsubClient`]. The nonblocking type is
-//! [`pubsub_client::nonblocking::PubsubClient`].
+//! [`nonblocking::pubsub_client::PubsubClient`].
 //!
 //! **TPU clients** communicate directly with the [TPU] of the [slot leader] to
 //! fill blocks with transactions as fast as possible. Validators are TPU
@@ -33,7 +33,7 @@
 //! tools that need to submit many transactions may want to communicate directly
 //! with the TPU. An example of a tool that communicates directly with the TPU
 //! is `solana program deploy`, which posts many transactions to deploy a single
-//! program.
+//! program. Of the multiple TPU clients the [`quic_client`] is recommended.
 //!
 //! [TPU]: https://docs.solana.com/validator/tpu
 //! [slot leader]: https://docs.solana.com/cluster/leader-rotation
@@ -44,13 +44,17 @@
 //! every client type from other crates. Instead of using this crate
 //! users may want to use crates specific to their purpose:
 //!
-//! - [`solana-rpc-client`] -
-//! - [`solana-rpc-client-api`] -
-//! - [`solana-rpc-client-nonce-utils`] -
-//! - [`solana-pubsub-client`] -
-//! - [`solana-tpu-client`] -
-//! - [`solana-udp-client`] -
-//! - [`solana-quic-client`] -
+//! - [`solana-rpc-client`] - The RPC client.
+//! - [`solana-pubsub-client`] - The Pubsub client.
+//! - [`solana-quic-client`] - The QUIC TPU client.
+//! - [`solana-udp-client`] - The UDP TPU client.
+//! - [`solana-tpu-client`] - The legacy TPU client.
+//!
+//! [`solana-rpc-client`]: https://docs.rs/solana-rpc-client
+//! [`solana-pubsub-client`]: https://docs.rs/solana-pubsub-client
+//! [`solana-quic-client`]: https://docs.rs/solana-quic-client
+//! [`solana-udp-client`]: https://docs.rs/solana-udp-client
+//! [`solana-tpu-client`]: https://docs.rs/solana-tpu-client
 
 #![allow(clippy::integer_arithmetic)]
 
